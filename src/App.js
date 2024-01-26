@@ -1,29 +1,26 @@
-import {config} from 'dotenv'
-import React from 'react';
-config()
+import React from 'react'
 
-import './App.css';
-import ZoomMtgEmbedded from '@zoom/meetingsdk/embedded';
+import './App.css'
+import ZoomMtgEmbedded from '@zoom/meetingsdk/embedded'
 
-function App() {
+function App () {
 
-  const client = ZoomMtgEmbedded.createClient();
+  const client = ZoomMtgEmbedded.createClient()
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const eml = urlParams.get('userEmail');
-  const meetingNumber = urlParams.get('meetingNumber');
-  const passWord = urlParams.get('password') || '';
-  const zakToken = urlParams.get('zak') || '';
+  const urlParams = new URLSearchParams(window.location.search)
+  const eml = urlParams.get('userEmail')
+  const meetingNumber = urlParams.get('meetingNumber')
+  const passWord = urlParams.get('password') || ''
+  const zakToken = urlParams.get('zak') || ''
+  const sdkKey = urlParams.get('sdkKey') || ''
 
   var authEndpoint = 'http://localhost:4000'
-  var sdkKey = process.env.SDK_KEY
   var role = 0
   var userName = 'React'
-  var userEmail = `${eml || 'random'}@someplacerandom.page`
-  var registrantToken = ''
+  var userEmail = `${eml || 'random'}@someplacerandom.com`
 
-  function getSignature(e) {
-    e.preventDefault();
+  function getSignature (e) {
+    e.preventDefault()
 
     fetch(authEndpoint, {
       method: 'POST',
@@ -33,35 +30,38 @@ function App() {
         role: role
       })
     }).then(res => res.json())
-    .then(response => {
-      startMeeting(response.signature)
-    }).catch(error => {
+      .then(response => {
+        startMeeting(response.signature)
+      }).catch(error => {
       console.error(error)
     })
   }
 
-  function startMeeting(signature) {
+  async function startMeeting (signature) {
 
-    let meetingSDKElement = document.getElementById('meetingSDKElement');
+    let meetingSDKElement = document.getElementById('meetingSDKElement')
 
-    client.init({zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true}).then(() => {
-      client.join({
+    try {
+      await client.init({ zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true })
+
+      await client.join({
         signature: signature,
         sdkKey: sdkKey,
         meetingNumber: meetingNumber,
         password: passWord,
         userName: userName,
         userEmail: userEmail,
-        tk: registrantToken,
-        zak: zakToken
-      }).then(() => {
-        console.log('joined successfully')
-      }).catch((error) => {
-        console.error('failed to join', error)
+        // tk: registrantToken,
+        zak: zakToken,
+        error: (e) => {
+          console.error('Internal error ', e)
+        }
       })
-    }).catch((error) => {
-      console.error('failed to init', error)
-    })
+
+      console.log('meeting started')
+    } catch (err) {
+      console.error('failed to init', err)
+    }
   }
 
   return (
@@ -77,7 +77,7 @@ function App() {
         <button onClick={getSignature}>Join Meeting</button>
       </main>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
