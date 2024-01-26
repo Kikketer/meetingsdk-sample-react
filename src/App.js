@@ -40,9 +40,28 @@ function App () {
   async function startMeeting (signature) {
 
     let meetingSDKElement = document.getElementById('meetingSDKElement')
+    let meetingSDKChatElement = document.getElementById('meetingSDKChatElement')
 
     try {
-      await client.init({ zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true })
+      await client.init({
+        zoomAppRoot: meetingSDKElement,
+        language: 'en-US',
+        patchJsMedia: true,
+        customize: {
+          video: {
+            popper: {
+              disableDraggable: true
+            }
+          },
+          chat: {
+            popper: {
+              disableDraggable: true,
+              anchorElement: meetingSDKChatElement,
+              placement: 'top'
+            }
+          }
+        }
+      })
 
       await client.join({
         signature: signature,
@@ -69,12 +88,26 @@ function App () {
       <main>
         <h1>Lets do this!</h1>
 
-        {/* For Component View */}
-        <div id="meetingSDKElement">
-          {/* Zoom Meeting SDK Component View Rendered Here */}
+        <div className="row">
+          <div className="column">
+            <h3>Videos Here</h3>
+            <div id="meetingSDKElement"></div>
+          </div>
+          <div className="column">
+            <h3>My Content Here</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et
+              dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex
+              ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
+              fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+              mollit anim id est laborum.</p>
+            <button onClick={getSignature}>Join Meeting</button>
+          </div>
+          <div className="column">
+            <h3>Chat Here</h3>
+            <div id="meetingSDKChatElement"></div>
+          </div>
         </div>
 
-        <button onClick={getSignature}>Join Meeting</button>
       </main>
     </div>
   )
