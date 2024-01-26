@@ -5,7 +5,6 @@ main {
 }
 
 main button {
-  margin-top: 20px;
   background-color: #2D8CFF;
   color: #ffffff;
   text-decoration: none;
@@ -13,11 +12,13 @@ main button {
   padding-bottom: 10px;
   padding-left: 40px;
   padding-right: 40px;
-  display: inline-block;
   border-radius: 10px;
   cursor: pointer;
   border: none;
   outline: none;
+
+  display: block;
+  margin: 1rem auto;
 }
 
 main button:hover {

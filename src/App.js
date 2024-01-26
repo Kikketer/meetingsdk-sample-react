@@ -42,7 +42,22 @@ function App () {
     let meetingSDKElement = document.getElementById('meetingSDKElement')
 
     try {
-      await client.init({ zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true })
+      await client.init({
+        zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true, customize: {
+          video: {
+            isResizable: true,
+            viewSizes: {
+              default: {
+                width: 600,
+                height: 600
+              }
+            },
+            popper: {
+              disableDraggable: false
+            }
+          }
+        }
+      })
 
       await client.join({
         signature: signature,
@@ -64,6 +79,17 @@ function App () {
     }
   }
 
+  function resizeVideo () {
+    client.updateVideoOptions({
+      viewSizes: {
+        default: {
+          width: Math.floor(Math.random() * 400) + 200,
+          height: Math.floor(Math.random() * 400) + 200,
+        }
+      }
+    })
+  }
+
   return (
     <div className="App">
       <main>
@@ -74,6 +100,7 @@ function App () {
           {/* Zoom Meeting SDK Component View Rendered Here */}
         </div>
 
+        <button onClick={resizeVideo}>Resize</button>
         <button onClick={getSignature}>Join Meeting</button>
       </main>
     </div>
