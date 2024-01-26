@@ -1,7 +1,7 @@
 import React from 'react'
 
 import './App.css'
-import ZoomMtgEmbedded from '@zoom/meetingsdk/embedded'
+import ZoomMtgEmbedded, { SuspensionViewType } from '@zoom/meetingsdk/embedded'
 
 function App () {
 
@@ -14,7 +14,8 @@ function App () {
   const zakToken = urlParams.get('zak') || ''
   const sdkKey = urlParams.get('sdkKey') || ''
 
-  var authEndpoint = 'http://localhost:4000'
+  // var authEndpoint = 'http://localhost:4000'
+  var authEndpoint = 'http://localhost:3000/api'
   var role = 0
   var userName = 'React'
   var userEmail = `${eml || 'random'}@someplacerandom.com`
@@ -46,6 +47,7 @@ function App () {
         zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true, customize: {
           video: {
             isResizable: true,
+            defaultViewType: 'gallery',
             viewSizes: {
               default: {
                 width: 1000,
