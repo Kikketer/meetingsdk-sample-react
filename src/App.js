@@ -1,11 +1,15 @@
-import React from 'react'
+import React from 'react';
 
-import './App.css'
-import ZoomMtgEmbedded from '@zoom/meetingsdk/embedded'
+import './App.css';
+import { ZoomMtg } from '@zoom/meetingsdk';
 
-function App () {
+ZoomMtg.preLoadWasm();
+ZoomMtg.prepareWebSDK();
 
-  const client = ZoomMtgEmbedded.createClient()
+function App() {
+
+  var registrantToken = ''
+  var leaveUrl = 'http://localhost:3000'
 
   const urlParams = new URLSearchParams(window.location.search)
   const eml = urlParams.get('userEmail')
@@ -19,8 +23,8 @@ function App () {
   var userName = 'React'
   var userEmail = `${eml || 'random'}@someplacerandom.com`
 
-  function getSignature (e) {
-    e.preventDefault()
+  function getSignature(e) {
+    e.preventDefault();
 
     fetch(authEndpoint, {
       method: 'POST',
@@ -30,63 +34,43 @@ function App () {
         role: role
       })
     }).then(res => res.json())
-      .then(response => {
-        startMeeting(response.signature)
-      }).catch(error => {
+    .then(response => {
+      startMeeting(response.signature)
+    }).catch(error => {
       console.error(error)
     })
   }
 
-  async function startMeeting (signature) {
+  function startMeeting(signature) {
+    document.getElementById('zmmtg-root').style.display = 'block'
 
-    let meetingSDKElement = document.getElementById('meetingSDKElement')
+    ZoomMtg.init({
+      leaveUrl: leaveUrl,
+      patchJsMedia: true,
+      defaultView: 'gallery',
+      success: (success) => {
+        console.log(success)
 
-    try {
-      await client.init({
-        zoomAppRoot: meetingSDKElement, language: 'en-US', patchJsMedia: true, customize: {
-          video: {
-            isResizable: true,
-            defaultViewType: 'gallery',
-            viewSizes: {
-              default: {
-                width: 1000,
-                height: 600
-              }
-            },
-            popper: {
-              disableDraggable: false
-            }
+        ZoomMtg.join({
+          signature: signature,
+          sdkKey: sdkKey,
+          meetingNumber: meetingNumber,
+          passWord: passWord,
+          userName: userName,
+          userEmail: userEmail,
+          tk: registrantToken,
+          zak: zakToken,
+          success: (success) => {
+            console.log(success)
+          },
+          error: (error) => {
+            console.log(error)
           }
-        }
-      })
+        })
 
-      await client.join({
-        signature: signature,
-        sdkKey: sdkKey,
-        meetingNumber: meetingNumber,
-        password: passWord,
-        userName: userName,
-        userEmail: userEmail,
-        // tk: registrantToken,
-        zak: zakToken,
-        error: (e) => {
-          console.error('Internal error ', e)
-        }
-      })
-
-      console.log('meeting started')
-    } catch (err) {
-      console.error('failed to init', err)
-    }
-  }
-
-  function resizeVideo () {
-    client.updateVideoOptions({
-      viewSizes: {
-        default: {
-          width: Math.floor(Math.random() * 1280) + 720,
-          height: Math.floor(Math.random() * 309) + 411,
-        }
+      },
+      error: (error) => {
+        console.log(error)
       }
     })
   }
@@ -94,18 +78,12 @@ function App () {
   return (
     <div className="App">
       <main>
-        <h1>Lets do this!</h1>
+        <h1>Zoom Meeting SDK Sample React</h1>
 
-        {/* For Component View */}
-        <div id="meetingSDKElement">
-          {/* Zoom Meeting SDK Component View Rendered Here */}
-        </div>
-
-        <button onClick={resizeVideo}>Resize</button>
         <button onClick={getSignature}>Join Meeting</button>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
